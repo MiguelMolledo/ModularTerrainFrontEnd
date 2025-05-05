@@ -1,9 +1,11 @@
-import { Mountain } from 'lucide-react';
+
 
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { NavigationMenuDemo } from "@/components/mainNavigationBar";
+import MainNavigationMenu from "@/components/MainNavigationMenu";
+import { Mountain } from 'lucide-react';
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,10 +31,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header style={{ padding: "1rem 0", textAlign: "center", fontSize: "2rem", fontWeight: "bold", letterSpacing: "2px" }}>
-          🚀 Modular Terrain APP 🚀
-        </header>
-        <NavigationMenuDemo />
+        <div className='flex items-center justify-center bg-gray-100'>
+          <Mountain />
+          <header style={{ padding: "1rem 0", textAlign: "center", fontSize: "2rem", fontWeight: "bold", letterSpacing: "2px" }}>
+            Modular Terrain APP
+          </header>
+          <Mountain />
+        </div>
+        <MainNavigationMenu />
         {children}
       </body>
     </html>
