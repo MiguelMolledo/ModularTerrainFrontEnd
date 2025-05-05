@@ -66,21 +66,21 @@ export default function MainNavigationMenu() {
         <NavigationMenu>
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <Link href="/maps" legacyBehavior passHref>
+                    <Link href="/maps">
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                             Maps
                         </NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <Link href="/terrain" legacyBehavior passHref>
+                    <Link href="/terrain" >
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                             Terrain
                         </NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <Link href="/materials" legacyBehavior passHref>
+                    <Link href="/materials">
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                             Materials
                         </NavigationMenuLink>
