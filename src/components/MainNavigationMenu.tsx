@@ -66,24 +66,18 @@ export default function MainNavigationMenu() {
         <NavigationMenu>
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <Link href="/maps">
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                            Maps
-                        </NavigationMenuLink>
+                    <Link href="/maps" className={navigationMenuTriggerStyle()}>
+                        Maps
                     </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <Link href="/terrain" >
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                            Terrain
-                        </NavigationMenuLink>
+                    <Link href="/terrain" className={navigationMenuTriggerStyle()}>
+                        Terrain
                     </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <Link href="/materials">
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                            Materials
-                        </NavigationMenuLink>
+                    <Link href="/materials" className={navigationMenuTriggerStyle()}>
+                        Materials
                     </Link>
                 </NavigationMenuItem>
 
@@ -149,7 +143,7 @@ export default function MainNavigationMenu() {
                 </NavigationMenuItem> */}
             </NavigationMenuList>
         </NavigationMenu>
-    )
+    );
 }
 
 const ListItem = React.forwardRef<
