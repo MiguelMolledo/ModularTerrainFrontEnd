@@ -6,6 +6,30 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { useState } from "react";
+import { CirclePlus } from 'lucide-react';
+
+
+
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+
 
 export interface MaterialInterface {
     id: number;
@@ -29,7 +53,7 @@ function LinksPopup({ links }: { links: string[] }) {
 
     return (
         <div className="relative">
-            <Button onClick={() => setOpen(!open)}>
+            <Button variant="secondary" onClick={() => setOpen(!open)}>
                 Buy Links <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
             {open && (
@@ -53,6 +77,207 @@ function LinksPopup({ links }: { links: string[] }) {
         </div>
     );
 }
+
+
+const newMaterialSchema = z.object({
+    name: z.string().min(1, "Username is required"),
+    description: z.string().min(6, "Password must be at least 6 characters"),
+    image: z.string(),
+    webLinks: z.array(z.string()),
+    price: z.number(),
+    dimensions: z.string(),
+
+});
+type NewMaterialValues = z.infer<typeof newMaterialSchema>;
+
+
+function NewMaterialForm() {
+    const form = useForm<NewMaterialValues>({
+        resolver: zodResolver(newMaterialSchema),
+        defaultValues: {
+            name: "",
+            description: "",
+            image: "",
+            webLinks: [""],
+            price: 0.0,
+            dimensions: "",
+        },
+    });
+
+    const onSubmit = (data: NewMaterialValues) => {
+        console.log("Login Data:", data);
+        // Handle login logic here
+    };
+
+
+
+    return (<div>
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField name="name"
+                    control={form.control}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Name </FormLabel>
+                            <FormControl>
+                                <Input placeholder=" Enter your Material Name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+
+                <FormField name="description"
+                    control={form.control}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Description </FormLabel>
+                            <FormControl>
+                                <Input placeholder=" Enter your description" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+
+                <FormField name="image"
+                    control={form.control}
+                    render={({ field }) => (
+                        <FormItem>
+                            <Label htmlFor="picture">Picture</Label>
+                            <FormControl>
+                                <Input id="picture" type="file" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+
+                <FormField name="price"
+                    control={form.control}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Price </FormLabel>
+                            <FormControl>
+                                <Input placeholder="0" type="number" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+
+                <FormField name="dimensions"
+                    control={form.control}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Description </FormLabel>
+                            <FormControl>
+                                <Input placeholder="Dimensions (3x3 inches / 16cm / 16x16 cm / 6 L" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                <FormField
+                    name="webLinks"
+                    control={form.control}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Web Links</FormLabel>
+                            <FormControl>
+                                <div className="flex flex-col gap-2">
+                                    {field.value.map((link: string, idx: number) => (
+                                        <div key={idx} className="flex gap-2 items-center">
+                                            <Input
+                                                placeholder={`Enter web link #${idx + 1}`}
+                                                value={link}
+                                                onChange={e => {
+                                                    const newLinks = [...field.value];
+                                                    newLinks[idx] = e.target.value;
+                                                    field.onChange(newLinks);
+                                                }}
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="destructive"
+                                                size="icon"
+                                                onClick={() => {
+                                                    const newLinks = field.value.filter((_, i) => i !== idx);
+                                                    field.onChange(newLinks.length ? newLinks : [""]);
+                                                }}
+                                                disabled={field.value.length === 1}
+                                            >
+                                                ×
+                                            </Button>
+                                        </div>
+                                    ))}
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        onClick={() => field.onChange([...field.value, ""])}
+                                    >
+                                        Add Link
+                                    </Button>
+                                </div>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <Button type="submit" className="w-full">
+                    Create
+                </Button>
+
+
+            </form>
+        </Form>
+
+    </div>
+    )
+
+}
+
+
+
+export function CreateMaterialPopup() {
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="outline">
+                    <CirclePlus />New Material
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Create Material</DialogTitle>
+                    <DialogDescription>
+                        Create a new material by filling out the form below. Once you are done, click "Create" to save your material.
+                    </DialogDescription>
+                </DialogHeader>
+                <NewMaterialForm />
+                {/* <div className="flex flex-col items-center space-x-2">
+                    <div className="grid flex gap-2">
+                        <Label>Name </Label>
+                        <Input type="text" placeholder="Material Name" />
+                    </div>
+                    <div className="grid flex gap-2">
+                        <Label>Description </Label>
+                        <Input type="text" placeholder="" />
+                    </div>
+                    <Button type="submit" size="sm" className="px-3">
+                        Create
+                    </Button>
+                </div> */}
+                <DialogFooter className="sm:justify-start">
+                    <DialogClose asChild>
+                        <Button type="button" variant="secondary">
+                            Close
+                        </Button>
+                    </DialogClose>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+
+
 
 export function Materials({ materials }: { materials: MaterialInterface[] }) {
     return (
