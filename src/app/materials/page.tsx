@@ -24,7 +24,7 @@ export default async function MaterialsPage() {
             <section>
                 <div><h1>Materials</h1></div>
                 <div className="flex items-center justify-center h-20">
-                    <input type="text" placeholder="  Search objects  " />
+                    <input className="border rounded p-2" type="text" placeholder="  Search objects  " />
                     <div className="flex-1" />
                     <CreateMaterialPopup />
                 </div>

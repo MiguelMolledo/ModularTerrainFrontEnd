@@ -1,15 +1,23 @@
 "use client";
-
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { useState } from "react";
-import { CirclePlus } from 'lucide-react';
-
-
-
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ChevronRight, CirclePlus } from "lucide-react";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+    CardFooter,
+} from "@/components/ui/card";
 import {
     Dialog,
     DialogContent,
@@ -19,17 +27,15 @@ import {
     DialogTitle,
     DialogTrigger,
     DialogClose,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-
-
+} from "@/components/ui/dialog";
+import {
+    Form,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormControl,
+    FormMessage,
+} from "@/components/ui/form";
 
 export interface MaterialInterface {
     id: number;
@@ -39,6 +45,7 @@ export interface MaterialInterface {
     price: number;
     dimensions: string;
     webLinks: string[];
+    tags: string[];
 
 }
 
@@ -53,7 +60,7 @@ function LinksPopup({ links }: { links: string[] }) {
 
     return (
         <div className="relative">
-            <Button variant="secondary" onClick={() => setOpen(!open)}>
+            <Button onClick={() => setOpen(!open)}>
                 Buy Links <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
             {open && (
@@ -91,7 +98,7 @@ const newMaterialSchema = z.object({
 type NewMaterialValues = z.infer<typeof newMaterialSchema>;
 
 
-function NewMaterialForm() {
+export function NewMaterialForm() {
     const form = useForm<NewMaterialValues>({
         resolver: zodResolver(newMaterialSchema),
         defaultValues: {
@@ -235,12 +242,13 @@ function NewMaterialForm() {
 
 
 export function CreateMaterialPopup() {
+    const [open, setOpen] = useState(false);
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline">
-                    <CirclePlus />New Material
+                <Button >
+                    <CirclePlus /> New Material
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
@@ -251,19 +259,6 @@ export function CreateMaterialPopup() {
                     </DialogDescription>
                 </DialogHeader>
                 <NewMaterialForm />
-                {/* <div className="flex flex-col items-center space-x-2">
-                    <div className="grid flex gap-2">
-                        <Label>Name </Label>
-                        <Input type="text" placeholder="Material Name" />
-                    </div>
-                    <div className="grid flex gap-2">
-                        <Label>Description </Label>
-                        <Input type="text" placeholder="" />
-                    </div>
-                    <Button type="submit" size="sm" className="px-3">
-                        Create
-                    </Button>
-                </div> */}
                 <DialogFooter className="sm:justify-start">
                     <DialogClose asChild>
                         <Button type="button" variant="secondary">
@@ -278,7 +273,6 @@ export function CreateMaterialPopup() {
 
 
 
-
 export function Materials({ materials }: { materials: MaterialInterface[] }) {
     return (
         <div className="grid grid-cols-3 gap-8">
@@ -286,24 +280,40 @@ export function Materials({ materials }: { materials: MaterialInterface[] }) {
                 <Card
                     className="flex flex-col justify-between"
                     key={material.id}
-                    style={{ maxWidth: "400px", maxHeight: "600px" }}
                 >
                     <CardHeader>
+
                         <CardTitle>{material.name}</CardTitle>
                         <CardDescription>{material.description}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Image src={material.image} alt={material.name} width={400} height={300} />
-                        <div>
-                            {material.price.toString()}&nbsp;
-                            <span role="img" aria-label="euro">
-                                €
-                            </span>
-                        </div>
+
                     </CardContent>
                     <CardFooter>
-                        <div className="ml-auto">
-                            <LinksPopup links={material.webLinks} />
+                        <div className="flex flex-col gap-2">
+                            <div className="grid grid-cols-3 gap-2">
+                                {material.tags.map((tag) => (
+                                    <Button
+                                        key={tag}
+                                        variant="secondary"
+
+                                    >
+                                        {tag}
+                                    </Button>
+                                ))}
+
+                            </div>
+                            <div className=" flex items-end">
+                                <div>
+                                    {material.price.toString()}&nbsp;
+                                    <span role="img" aria-label="euro">
+                                        €
+                                    </span>
+                                </div>
+                                <div className="flex-1" />
+                                <LinksPopup links={material.webLinks} />
+                            </div>
                         </div>
                     </CardFooter>
                 </Card>
@@ -311,3 +321,7 @@ export function Materials({ materials }: { materials: MaterialInterface[] }) {
         </div>
     );
 }
+
+
+
+
