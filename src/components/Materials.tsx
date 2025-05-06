@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/form";
 
 export interface MaterialInterface {
-    id: number;
+    _id: string;
     name: string;
     description: string;
     image: string;
@@ -60,7 +60,9 @@ function LinksPopup({ links }: { links: string[] }) {
 
     return (
         <div className="relative">
-            <Button onClick={() => setOpen(!open)}>
+            <Button
+                onClick={() => setOpen(!open)}
+            >
                 Buy Links <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
             {open && (
@@ -98,7 +100,7 @@ const newMaterialSchema = z.object({
 type NewMaterialValues = z.infer<typeof newMaterialSchema>;
 
 
-export function NewMaterialForm() {
+export function NewMaterialForm({ setOpen, handleNewMaterial }: { setOpen: (value: boolean) => void; handleNewMaterial: (newMaterial: MaterialInterface) => void; }) {
     const form = useForm<NewMaterialValues>({
         resolver: zodResolver(newMaterialSchema),
         defaultValues: {
@@ -111,9 +113,34 @@ export function NewMaterialForm() {
         },
     });
 
-    const onSubmit = (data: NewMaterialValues) => {
+    const onSubmit = async (data: NewMaterialValues) => {
         console.log("Login Data:", data);
+
+        try {
+            const response = await fetch("http://localhost:3001/materials/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to create material");
+            }
+
+            console.log("Material created successfully:", await response.json());
+            // update material list 
+            const newMaterial: MaterialInterface = await response.json();
+            handleNewMaterial(newMaterial)
+
+        } catch (error) {
+            console.error("Error creating material:", error);
+        }
         // Handle login logic here
+
+
+        setOpen(false);
     };
 
 
@@ -240,8 +267,7 @@ export function NewMaterialForm() {
 }
 
 
-
-export function CreateMaterialPopup() {
+export function CreateMaterialPopup({ handleNewMaterial }: { handleNewMaterial: (material: MaterialInterface) => void }) {
     const [open, setOpen] = useState(false);
 
     return (
@@ -258,13 +284,8 @@ export function CreateMaterialPopup() {
                         Create a new material by filling out the form below. Once you are done, click "Create" to save your material.
                     </DialogDescription>
                 </DialogHeader>
-                <NewMaterialForm />
+                <NewMaterialForm setOpen={setOpen} handleNewMaterial={handleNewMaterial} />
                 <DialogFooter className="sm:justify-start">
-                    <DialogClose asChild>
-                        <Button type="button" variant="secondary">
-                            Close
-                        </Button>
-                    </DialogClose>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -279,7 +300,7 @@ export function Materials({ materials }: { materials: MaterialInterface[] }) {
             {materials.map((material) => (
                 <Card
                     className="flex flex-col justify-between"
-                    key={material.id}
+                    key={material._id}
                 >
                     <CardHeader>
 
@@ -291,7 +312,7 @@ export function Materials({ materials }: { materials: MaterialInterface[] }) {
 
                     </CardContent>
                     <CardFooter>
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2 flex-1">
                             <div className="grid grid-cols-3 gap-2">
                                 {material.tags.map((tag) => (
                                     <Button
@@ -304,8 +325,8 @@ export function Materials({ materials }: { materials: MaterialInterface[] }) {
                                 ))}
 
                             </div>
-                            <div className=" flex items-end">
-                                <div>
+                            <div className=" flex items-end ">
+                                <div className="text-lg font-bold" style={{ width: "auto", minWidth: 30 }} >
                                     {material.price.toString()}&nbsp;
                                     <span role="img" aria-label="euro">
                                         €

@@ -1,13 +1,14 @@
+"use client";
 
-
-
+import { useEffect, useState } from "react";
 import { Suspense } from "react";
 import { Materials, MaterialInterface, CreateMaterialPopup } from "@/components/Materials";
 
 
 
-async function fetchMaterials() {
-    const res = await fetch("http://localhost:4000/materials");
+async function fetchMaterials(): Promise<MaterialInterface[]> {
+    // const res = await fetch("http://localhost:4000/materials");
+    const res = await fetch("http://localhost:3001/materials/all");
     if (!res.ok) {
         throw new Error("Failed to fetch data");
     }
@@ -16,8 +17,21 @@ async function fetchMaterials() {
 
 
 
-export default async function MaterialsPage() {
-    const materials = await fetchMaterials();
+
+
+export default function MaterialsPage() {
+
+
+    const [materials, setMaterials] = useState<MaterialInterface[]>([]);
+    useEffect(() => {
+        fetchMaterials()
+            .then(data => (setMaterials(data)))
+            .catch(error => console.error("Error fetching materials:", error));
+    }, []);
+
+
+    const handleNewMaterial = (newMaterial: MaterialInterface) => ([...materials, newMaterial])
+
 
     return (
         <main>
@@ -26,7 +40,7 @@ export default async function MaterialsPage() {
                 <div className="flex items-center justify-center h-20">
                     <input className="border rounded p-2" type="text" placeholder="  Search objects  " />
                     <div className="flex-1" />
-                    <CreateMaterialPopup />
+                    <CreateMaterialPopup handleNewMaterial={handleNewMaterial} />
                 </div>
                 <Suspense fallback={<div>Loading...</div>}>
                     <Materials materials={materials} />
