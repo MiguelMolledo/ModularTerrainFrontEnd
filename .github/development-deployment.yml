@@ -1,0 +1,38 @@
+name: '[DEV] Modular Terrain Auto deployment '
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo followed by a tag
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to deploy (e.g. v1.2.3)"
+        required: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write #This is required for requesting the OIDC JWT Token
+      contents: read #Required when GH token is used to authenticate with private repo
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+      # Determine the version (from tag or from the dispatch input)
+      - name: Resolve version string
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "tag" ]]; then
+            echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          elif [[ -n "${{ inputs.version }}" ]]; then
+            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "::error::No version provided"; exit 1
+          fi
+          
