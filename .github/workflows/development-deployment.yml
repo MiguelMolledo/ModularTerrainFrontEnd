@@ -1,6 +1,6 @@
 name: '[DEV] Modular Terrain Auto deployment '
 
-# When this action will be executed
+# When this action will be executed test tag 0.0.1
 on:
   # Automatically trigger it when detected changes in repo followed by a tag
   push:
