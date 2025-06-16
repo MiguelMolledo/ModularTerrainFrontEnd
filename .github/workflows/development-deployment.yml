@@ -15,15 +15,16 @@ on:
         required: true
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write #This is required for requesting the OIDC JWT Token
-      contents: read #Required when GH token is used to authenticate with private repo
+
+    environment:
+      name: development
+      url: ${{ steps.deploy.outputs.app_url }}
 
     steps:
       - name: Checkout to the branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # Determine the version (from tag or from the dispatch input)
       - name: Resolve version string
         id: version
@@ -35,4 +36,9 @@ jobs:
           else
             echo "::error::No version provided"; exit 1
           fi
+
+      - name: Verify version resolution
+        run: |
+          echo "Version resolved: ${{ steps.version.outputs.version }}"
+          echo "Process reached version verification step successfully"
           
